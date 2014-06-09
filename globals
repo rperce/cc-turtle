@@ -1,0 +1,70 @@
+t = turtle
+local loop_limit = 32
+function clearDown()
+    for i = 1, loop_limit do
+        if not(t.detectDown()) then return true end
+        if not(t.digDown()) then
+            t.attackDown()
+        end
+    end
+    return false
+end
+
+function dropoff()
+    clearDown()
+    t.select(15) t.placeDown()
+    for i=1, 14 do t.select(i) t.dropDown() end
+    t.digDown()
+end
+
+function refuel()
+    clearDown()
+    t.select(16) t.placeDown()
+    t.suck() t.refuel()
+    t.digDown()
+end
+
+function go(n)
+    for i=1, n do go() end
+end
+
+function go()
+    for i=1, loop_limit do
+        if t.forward() then return true end
+        if not(t.dig()) then
+            t.attack()
+        end
+    end
+    return false
+end
+
+function next_free()
+    for i=1, 16 do
+        if t.getItemCount(i) < 1 then
+            return i
+        end
+    end
+    return 17
+end
+
+function cgo(n)
+    if next_free() > 13 then
+        dropoff()
+    end
+    if t.getFuelLevel() < 1 then
+        refuel()
+    end
+    go(n)
+end
+
+function cgo(n, method)
+    cgo(n)
+    method()
+end
+
+function start_message()
+    print("This turtle will not")
+    print("function without a coal")
+    print("chest in slot 16 and an")
+    print("item chest in slot 15.")
+end
