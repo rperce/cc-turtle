@@ -14,26 +14,27 @@ function dropoff()
     clearDown()
     t.select(15) t.placeDown()
     for i=1, 14 do t.select(i) t.dropDown() end
+
     t.digDown()
 end
 
 function refuel()
     clearDown()
     t.select(16) t.placeDown()
-    t.suck() t.refuel()
+    t.suckDown() t.refuel()
     t.digDown()
 end
 
-function go(n)
-    for i=1, n do go() end
-end
-
-function go()
-    for i=1, loop_limit do
-        if t.forward() then return true end
-        if not(t.dig()) then
-            t.attack()
+function go(args)
+    stop = args[1] or 1
+    for i=1, stop do
+        for i=1, loop_limit do
+            if t.forward() then break end
+            if not(t.dig()) then
+                t.attack()
+            end
         end
+        if args[2] then args[2]() end
     end
     return false
 end
@@ -47,20 +48,20 @@ function next_free()
     return 17
 end
 
-function cgo(n)
+function cgo(inp)
+    args = inp or {}
+    n = args[1] or 1
     if next_free() > 13 then
         dropoff()
     end
     if t.getFuelLevel() < 1 then
         refuel()
     end
-    go(n)
+    go{n, args[2]}
 end
 
-function cgo(n, method)
-    cgo(n)
-    method()
-end
+function r(i) n = i or 1 for j=1, n do t.turnRight() end end
+function l(i) n = i or 1 for j=1, n do t.turnLeft() end end
 
 function start_message()
     print("This turtle will not")
@@ -68,3 +69,4 @@ function start_message()
     print("chest in slot 16 and an")
     print("item chest in slot 15.")
 end
+
